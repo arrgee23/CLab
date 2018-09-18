@@ -1,26 +1,25 @@
+/*
+* Rahul Gautam
+* CS 1835
+* Implementation of ageneric stack
+* And also queue. Because why not?
+*/
+
 typedef struct {
 
 	void *elements;
 	int element_size, num_elements, max_elements;
 } STACK;
 
-	STACK* newStack(int element_size);
+STACK* newStack(int element_size);
 
-	void initStack (STACK *s, int element_size);
-	void freeStack(STACK *s);
-	int isEmpty(const STACK *s);
-	void push(STACK *s, const void *eptr);
-	void pop(STACK *s, void *eptr);
+void initStack (STACK *s, int element_size);
+void freeStack(STACK *s);
+int isEmpty(const STACK *s);
+void push(STACK *s, const void *eptr);
+void pop(STACK *s, void *eptr);
+void dequeue(STACK* s,void *eptr);
 
-
-/*
-* Rahul Gautam
-* CS 1835
-* Implementation of ageneric stack
-*/
-
-
-//#include "gstack.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -54,6 +53,18 @@ void push(STACK *s, const void *eptr)
 		
 }
 
+// dequeue
+void dequeue(STACK* s,void *eptr)
+{
+	if(s->num_elements > 0)
+	{
+		memcpy(eptr, s->elements, s->element_size);
+		s->num_elements--;
+		s->elements = (char*)s->elements + s->element_size;
+		printf("[dequeue]address = %u num elm = %d\n",s->elements,s->num_elements );
+	}
+}
+
 void pop(STACK *s, void *eptr)
 {
 	if(s->num_elements > 0)
@@ -78,15 +89,11 @@ int main()
 	push(ss,(void*)&a);
 	push(ss,(void*)&b);
 
-	pop(ss,(void*)&dummy);
+	dequeue(ss,(void*)&dummy);
 	printf("%f\n",dummy);
 
-	pop(ss,(void*)&dummy);
+	dequeue(ss,(void*)&dummy);
 	printf("%f\n",dummy);
-
-
-
-
 
 	return 0;
 }
