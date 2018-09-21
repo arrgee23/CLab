@@ -109,10 +109,10 @@ int main()
     arr[5] = 9;
     arr[6] = -5;   
     */
-    int arr[] = {89,3,-2,6,7,2};
+    int arr[] = {5,3,4};
     int l = sizeof(arr)/sizeof(int);
 
-    printf("%d**\n",l);
+    //printf("%d**\n",l);
 
     printArray((int*)arr,l);
     quickSort((void*)arr,sizeof(int),0,l-1,&compareInt);

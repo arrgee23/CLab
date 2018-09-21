@@ -26,14 +26,14 @@ void dequeue(STACK* s,void *eptr);
 
 #define SIZE 255
 
-STACK* newStack(int element_size)
+STACK* newStack(int element_size,int maxSize)
 {
 	STACK* s = (STACK*)malloc(sizeof(STACK));
 	if(s != NULL)
 	{
 		s->element_size = element_size;
 		s->num_elements = 0;
-		s->max_elements = SIZE;
+		s->max_elements = maxSize;
 		s->elements = malloc(s->max_elements*element_size);
 	}
 	return s;
@@ -80,7 +80,7 @@ void pop(STACK *s, void *eptr)
 
 int main()
 {
-	STACK* ss = newStack(sizeof(int));
+	STACK* ss = newStack(sizeof(int),100);
 	float a = 3;
 	float b = 5;
 
