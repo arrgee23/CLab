@@ -5,24 +5,16 @@
 * And also queue. Because why not?
 */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 typedef struct {
 
 	void *elements;
 	int element_size, num_elements, max_elements;
 } STACK;
 
-STACK* newStack(int element_size);
-
-void initStack (STACK *s, int element_size);
-void freeStack(STACK *s);
-int isEmpty(const STACK *s);
-void push(STACK *s, const void *eptr);
-void pop(STACK *s, void *eptr);
-void dequeue(STACK* s,void *eptr);
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #define SIZE 255
 
@@ -48,7 +40,7 @@ void push(STACK *s, const void *eptr)
 		memcpy(stackElementAddress, eptr, s->element_size);
 		s->num_elements++;
 
-		printf("[push]address = %u num elm = %d\n",stackElementAddress,s->num_elements );
+		//printf("[push]address = %u num elm = %d\n",stackElementAddress,s->num_elements );
 	}
 		
 }
@@ -61,7 +53,7 @@ void dequeue(STACK* s,void *eptr)
 		memcpy(eptr, s->elements, s->element_size);
 		s->num_elements--;
 		s->elements = (char*)s->elements + s->element_size;
-		printf("[dequeue]address = %u num elm = %d\n",s->elements,s->num_elements );
+		//printf("[dequeue]address = %u num elm = %d\n",s->elements,s->num_elements );
 	}
 }
 
@@ -73,7 +65,7 @@ void pop(STACK *s, void *eptr)
 		memcpy(eptr, stackElementAddress, s->element_size);
 		s->num_elements--;
 
-		printf("[pop]address = %u num elm = %d\n",stackElementAddress,s->num_elements );
+		//printf("[pop]address = %u num elm = %d\n",stackElementAddress,s->num_elements );
 	}
 
 } 

@@ -11,7 +11,7 @@
 #include <string.h>
 #include <assert.h>
 
-#define SIZE 5000
+#define SIZE 10000
 #define NEG_INF -9999999
 
 typedef struct Sequence
@@ -23,6 +23,7 @@ typedef struct Sequence
     void *array;
 } SEQUENCE;
 
+// Error printing functions to print errors at ease
 void printError(int i)
 {
     switch (i)
@@ -40,7 +41,7 @@ void printError(int i)
         break;
     }
 }
-
+// having passed a sequence, gets its return value back
 static long getNumericValue(SEQUENCE *s, size_t i)
 {
     assert(i< s->size);
@@ -139,7 +140,8 @@ static void printSeq(SEQUENCE *s)
         int *arr = (int *)s->array;
         for (int i = 0; i < s->capacity; i++)
         {
-            printf("%d(%ld) ", arr[i], getNumericValue(s, i));
+            printf("%d ", arr[i]);
+            //printf("%d(%ld) ", arr[i], getNumericValue(s, i));
         }
     }
     else if (s->type == 'f')
@@ -147,7 +149,8 @@ static void printSeq(SEQUENCE *s)
         float *arr = (float *)s->array;
         for (int i = 0; i < s->capacity; i++)
         {
-            printf("%f(%ld) ", arr[i], getNumericValue(s, i));
+            printf("%f ", arr[i]);
+            //printf("%f(%ld) ", arr[i], getNumericValue(s, i));
         }
     }
     else if (s->type == 's')
@@ -155,12 +158,13 @@ static void printSeq(SEQUENCE *s)
         char **arr = (char **)s->array;
         for (int i = 0; i < s->capacity; i++)
         {
-            printf("%s(%ld) ", arr[i], getNumericValue(s, i));
+            printf("%s ", arr[i]);
+            //printf("%s(%ld) ", arr[i], getNumericValue(s, i));
         }
     }
     printf("\n");
 }
-
+// adds a value to a sequence
 static void add(SEQUENCE *s, void *value)
 {
     char* str=NULL;
@@ -271,6 +275,6 @@ int main()
         }
     }
     printSeq(seqArray[maxIndex]);
-    
+
     return 0;
 }
