@@ -6,28 +6,24 @@
 * https://www.isical.ac.in/~pdslab/2018/assignments/assignment2.pdf
 */
 
+#define TEST_REPEAT 10
+#define INITIAL_ALLOCATION 10
+
+// useful macro for coding comfort
+#define DURATION(start, end) ((end.tv_usec - start.tv_usec) + (end.tv_sec - start.tv_sec) * 1000000)
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
-
-#define REPEAT 10
-#define INITIAL_ALLOCATION 10
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <string.h>
-
-#define INITIAL_ALLOCATION 10
-
+#include <sys/time.h>
 typedef struct
 {
-    size_t element_size;                  // Generic implementation
-    unsigned int num_allocated, num_used; // Keep track of the size
-    void *array;                          // Using one-based indexing
-    int (*comparator)(void *, void *);    // Returns -ve, 0, or +ve
-    int type;                             // 0 for maxHeap, 1 for minHeap
+    size_t element_size;                           // Generic implementation
+    unsigned int num_allocated, num_used;          // Keep track of the size
+    void *array;                                   // Using one-based indexing
+    int (*comparator)(const void *, const void *); // Returns -ve, 0, or +ve
+    int type;                                      // 0 for maxHeap, 1 for minHeap
 } HEAP;
 
 // swap elements at ith and jth index
@@ -47,7 +43,7 @@ static void _swap(HEAP *h, int i, int j)
 
 void initHeap(HEAP **hh, size_t elemSize,
               unsigned int num_allocated,
-              int (*some_comparator)(void *, void *))
+              int (*some_comparator)(const void *, const void *))
 {
     *hh = malloc(sizeof(HEAP));
     HEAP *h = *hh;
@@ -110,7 +106,7 @@ void printAsString(HEAP *h)
 }
 static char *_getElemAddr(HEAP *h, int index)
 {
-    assert(index <= h->num_used && index>0);
+    assert(index <= h->num_used && index > 0);
     char *base = h->array;
     return base + index * (h->element_size);
 }
@@ -126,46 +122,48 @@ void _swapDown(HEAP *h, int index)
     }
 
     int maxIndex = index;
-    if (leftChild != -1 && h->comparator(_getElemAddr(h,maxIndex), _getElemAddr(h,leftChild) )<0)
+    if (leftChild != -1 && h->comparator(_getElemAddr(h, maxIndex), _getElemAddr(h, leftChild)) < 0)
         maxIndex = leftChild;
 
-    if (rightChild != -1 && h->comparator(_getElemAddr(h,maxIndex), _getElemAddr(h,rightChild))<0)
+    if (rightChild != -1 && h->comparator(_getElemAddr(h, maxIndex), _getElemAddr(h, rightChild)) < 0)
         maxIndex = rightChild;
-    
-    if(maxIndex != index)
+
+    if (maxIndex != index)
     {
         // swap the two elements
-        _swap(h,maxIndex,index);
+        _swap(h, maxIndex, index);
 
         // now tree rooted at maxIndex may not satisfy heap property
         // so recursively swapdown
-        _swapDown(h,maxIndex);
+        _swapDown(h, maxIndex);
     }
 }
 
 void extract(HEAP *h, void *buffer)
 {
     assert(h->num_used);
-    memcpy(buffer, _getElemAddr(h,1), h->element_size);
-    memcpy(_getElemAddr(h,1), _getElemAddr(h,h->num_used),h->element_size);
+    memcpy(buffer, _getElemAddr(h, 1), h->element_size);
+    memcpy(_getElemAddr(h, 1), _getElemAddr(h, h->num_used), h->element_size);
     h->num_used--;
     _swapDown(h, 1);
 }
 
-int compareInt(void *a, void *b)
+int compareRevInt(const void *a, const void *b)
 {
     return (*((int *)b)) - (*((int *)a));
 }
-void kSortedSort(int *arr, int size, int k)
+int compareInt(const void *a, const void *b)
 {
-    
-    HEAP *h = NULL;
-    initHeap(&h, sizeof(int), k + 1,&compareInt);
+    return (*((int *)a)) - (*((int *)b));
+}
+void kSortedSort(int *arr, int size, int k, HEAP *h)
+{
+
     int ctr = 0;
     // store 1st k+1 items in a heap
     while (ctr < k + 1)
     {
-        insert(h,(void*)(&arr[ctr]));
+        insert(h, (void *)(&arr[ctr]));
         ctr++;
     }
 
@@ -183,25 +181,24 @@ void kSortedSort(int *arr, int size, int k)
         // and insert the leftmost element that have not already been inserted into the heap
 
         // extact min value in the temp variable
-        extract(h,(void*)&temp);
+        extract(h, (void *)&temp);
         arr[idx++] = temp;
 
         temp = arr[ctr++];
         // insert temp into heap
-        insert(h,(void*)&temp);
+        insert(h, (void *)&temp);
 
         /*
         printf("After %d th extraction: ",idx);
         printAsInt(h);
         printf("\n");
         */
-    
     }
     // extract heap till its empty and keep on inserting in array
     while (h->num_used != 0) // TODO not heap empty check
     {
         // extract heap
-        extract(h,(void*)&temp);
+        extract(h, (void *)&temp);
         //assert(idx < size);
         arr[idx++] = temp;
     }
@@ -215,36 +212,116 @@ void print(int *arr, int n)
     printf("\n");
 }
 
-void TestCaseCompare(int *arr, int n)
+void copyArr(int *src, int *dst, int size)
 {
+    int i = 0;
+    for (int i = 0; i < size; i++)
+    {
+        dst[i] = src[i];
+    }
 }
+
+void compareRuntime(int *bkupArr, int arrSize, int k)
+{
+    HEAP *h = NULL;
+    // this is where the unsorted array will be copied each time
+    int *arr = (int *)malloc((arrSize) * sizeof(int));
+    struct timeval startTime, endTime, startTimeQsort, endTimeQsort;
+    initHeap(&h, sizeof(int), k + 1, &compareRevInt);
+    
+    int i = 0;
+    
+    double qSortDuration = 0;
+    for (i = 0; i < TEST_REPEAT; i++)
+    {
+        copyArr(bkupArr, arr, arrSize);
+        //print(arr,arrSize);
+        // Store the starting time
+        if (gettimeofday(&startTime, NULL) == -1)
+            printf("gettimeofday failed");
+        // The code whose running time is to be measured
+        qsort((void*)arr,arrSize,sizeof(int),&compareInt);
+
+        if (gettimeofday(&endTime, NULL) == -1)
+            printf("gettimeofday failed");
+
+        //printf("%d\n", (int) DURATION(startTime, endTime));
+        int duration = (int) DURATION(startTime, endTime);
+        qSortDuration += ((double)duration)/TEST_REPEAT;
+        //print(arr,arrSize);
+    }
+    //print(arr,arrSize);
+    printf("Qsort avg time over %d cases = %lfms\n",TEST_REPEAT,qSortDuration);
+    
+    double heapSortDuration = 0;
+    for (i = 0; i < TEST_REPEAT; i++)
+    {
+        copyArr(bkupArr, arr, arrSize);
+        //print(arr, arrSize);
+        h->num_used = 0;
+        // Store the starting time
+        if (gettimeofday(&startTime, NULL) == -1)
+            printf("gettimeofday failed");
+
+        // The code whose running time is to be measured
+        kSortedSort(arr, arrSize, k, h);
+
+        if (gettimeofday(&endTime, NULL) == -1)
+            printf("gettimeofday failed");
+
+        //printf("%d\n", (int)DURATION(startTime, endTime));
+        int duration = (int)DURATION(startTime, endTime);
+        heapSortDuration += ((double)duration) / TEST_REPEAT;
+        //print(arr, arrSize);
+    }
+    //print(arr,arrSize);
+    printf("Avg time using Heap over %d cases = %lfms\n",TEST_REPEAT,heapSortDuration);
+    
+}
+
 /*
 * Consider an unsorted array A[0 . . . n − 1] containing n distinct integers. After the array is sorted,
 * suppose that element A[i] of the original array moves to A[ji]. Assuming that |i − ji| ≤ k for all
 * i = 0, 1, . . . , n − 1, write a program to sort the original array A efficiently. You may use upto O(k)
 * additional space to store a heap
+* Basic Testcases follows in each line(to be provided as command line input):
+* k followed by ints
+3 6 5 3 2 8 10 9
+4 10 9 8 7 4 70 60 50
 */
 int main(int argc, char **argv)
 {
+    HEAP *h = NULL;
     // first item is k
     int arrSize = argc - 2;
     int *arr = (int *)malloc((arrSize) * sizeof(int));
-    if (!arr)
+
+    // Take a backup of the array for comparison
+    // of sorting speed with qsort
+    int *bkupArr = (int *)malloc((arrSize) * sizeof(int));
+
+    if (!arr || !bkupArr)
         assert(0);
 
     int k = atoi(argv[1]);
-    assert(k>=0 && k<arrSize);
+    assert(k >= 0 && k < arrSize);
 
     for (int i = 2; i < argc; i++)
     {
-        arr[i-2] = atoi(argv[i]);
+        arr[i - 2] = atoi(argv[i]);
+        bkupArr[i - 2] = atoi(argv[i]);
     }
     /*
     printf("%d\n",k);
     print(arr,arrSize);
     */
-    kSortedSort(arr, arrSize, k);
+
+    initHeap(&h, sizeof(int), k + 1, &compareRevInt);
+    kSortedSort(arr, arrSize, k, h);
+
+    printf("Soted array using heap: ");
     print(arr, arrSize);
+    compareRuntime(bkupArr, arrSize, k);
 
     return 0;
 }
