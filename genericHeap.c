@@ -126,6 +126,26 @@ void _swapDown(HEAP *h, int index)
         _swapDown(h,maxIndex);
     }
 }
+// arrLen = length of the array containing heap
+// no of heap elements would be arrLen - 1 as index 0 is 
+void initHeapFromArray(HEAP **hh,size_t elemSize,
+                        void* arr,
+                        int arrLen,
+                        int (*some_comparator)(void*, void*))
+{
+    *hh = malloc(sizeof(HEAP));
+    HEAP *h = *hh;
+    h->element_size = elemSize;
+    h->num_used = arrLen-1;
+    h->num_allocated = arrLen;
+    h->array = arr; // 1 index heap
+    assert(h->array != NULL);
+    h->comparator = some_comparator;
+
+    int i=0;
+    for(i=((arrLen-1)/2); i>=1; i--)
+        _swapDown(h,i);
+}
 
 void extract(HEAP *h, void *buffer)
 {
