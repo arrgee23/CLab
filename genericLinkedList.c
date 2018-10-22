@@ -188,8 +188,10 @@ Node* nodeAtIndex(LinkedList *ll, int i)
     Node *temp = ll->head;
     int cnt = 0;
     while(cnt<i)
+    {
         temp = temp->next;
-    
+        cnt++;
+    }
     return temp;
 }
 
@@ -267,6 +269,8 @@ int main()
     j = 3;
     deleteValue(ll,(void*)&j);
     printIntList(ll);
+
+    
     //int k = 7;
     //printf("\n%d\n", find(ll, (void *)&k));
 }
