@@ -273,13 +273,22 @@ Pair execute(LinkedList **q, int startWith)
     //printProcessList(q[1]);
 
     // while there is still time and process to execute
+    int fLastCycle = 0;
     while (time < SCHEDULE_TOTAL && (q[i]->length > 0 || q[1 - i]->length > 0))
     {
+        int fProcessExecuted = 0;
         int duration = QUANTUM_SMALL;
         if (pExecuted[1 - i] > pExecuted[i])
         {
             duration = QUANTUM_BIG;
         }
+        /*
+        if(duration >= SCHEDULE_TOTAL-time)
+        {
+            duration = SCHEDULE_TOTAL-time;
+            fLastCycle = 1;
+        }
+        */
 
         // try to schedule process from ith queue
         if (q[i]->length > 0)
@@ -295,10 +304,11 @@ Pair execute(LinkedList **q, int startWith)
                     duration -= headProcess->et;
                     time += headProcess->et;
 
-                    if (time < SCHEDULE_TOTAL)
+                    if (time <= SCHEDULE_TOTAL)
                     {
                         //printf("time=%d %s(%d) executed[%d]=%d", time, headProcess->id, headProcess->et, i, pExecuted[i] + 1);
                         pExecuted[i]++;
+                        fProcessExecuted = 1;
                     }
                     //printf("\n");
                     // delete process
@@ -364,12 +374,20 @@ Pair execute(LinkedList **q, int startWith)
                     //printf("\n");
                 }
                 // assuming after rescheduling we dont use the remaining time to schedule process in same queue
-                if (duration != 0)
-                {
-                    time += duration;
-                    idleTime += duration;
-                    //printf("time=%d idle(%d)", time, duration);
-                }
+                if (time < SCHEDULE_TOTAL)
+                    if (duration != 0)
+                    {
+                        time += duration;
+
+                        if (fProcessExecuted )
+                        {
+                            
+                            idleTime += duration;
+                            if(time>SCHEDULE_TOTAL)
+                                idleTime -= time-SCHEDULE_TOTAL; 
+                            //printf("time=%d idle(%d)", time, duration);
+                        }
+                    }
                 //printf(" \n");
             }
         }
