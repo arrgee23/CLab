@@ -12,12 +12,12 @@
 #define MAX_NODES 100000
 #define NULL_NODE_INDEX 1
 #define IMAGINARY_NODE_INDEX 0
+#define MAX_NO_OF_STRINGS 100
 
 #define DEBUG
 typedef struct Node
 {
-    int start;
-    int end;
+    int start[MAX_NO_OF_STRINGS]; // start index of all strings start[i] is -1 if no such string 
     int length;
     int sEdge;                // index of suffix edge node
     int iEdge[ALPHABET_SIZE]; // insertion edge node
@@ -31,7 +31,7 @@ typedef struct PalindromicTree
     //char* string; // string for which the tree is built
     node nodeArray[MAX_NODES];
     int ptr; // points to the last created node. longest palindrome
-
+    int size; // total no of nodes
 } arrTree;
 
 void initNode(node *n, int len)
@@ -41,6 +41,8 @@ void initNode(node *n, int len)
     int i = 0;
     for (i = 0; i < ALPHABET_SIZE; i++)
         n->iEdge[i] = -1;
+    for (i = 0; i < MAX_NO_OF_STRINGS; i++)
+        n->start[i] = -1;
 }
 void initTree(arrTree *t)
 {
@@ -55,10 +57,10 @@ void initTree(arrTree *t)
     t->nodeArray[NULL_NODE_INDEX].sEdge = IMAGINARY_NODE_INDEX;
 
     t->ptr = NULL_NODE_INDEX; // points to null node initialy
+    t->size = 2;
 }
-int size = 2;
-// add I th char of the string to the arrtrree
-void add(arrTree *t, char *string, int i)
+// add I th char of the j th string to the eertrree
+void add(arrTree *t, char *string, int i,int j)
 {
     int cursor = t->ptr;
 
@@ -86,24 +88,22 @@ void add(arrTree *t, char *string, int i)
     // setup its suffix link
     if (parent->iEdge[string[i] - 'a'] == -1)
     {
-        size++;
         // make a new node
-        t->ptr=size;
+        t->ptr=t->size;
         //node *newNode = &(t->nodeArray[t->ptr]);
-        node *newNode = &(t->nodeArray[size]);
+        node *newNode = &(t->nodeArray[t->size++]);
 
         initNode(newNode, parent->length + 2);   // the length would be parent node +2
         parent->iEdge[string[i] - 'a'] = t->ptr; // add insertion edge
 
         // adjust start and end
-        newNode->start = i - newNode->length + 1;
-        newNode->end = i;
+        newNode->start[j] = i - newNode->length + 1;
 
         #ifdef DEBUG
         printf("adding: ");
-        for(int j=newNode->start;j<=i;j++)
+        for(int k=newNode->start[j];k<newNode->start[j]+newNode->length;k++)
         {
-            printf("%c",string[j]);
+            printf("%c",string[k]);
         }
         puts("");
         #endif
@@ -145,30 +145,39 @@ int main()
     initTree(at);
     for(int i=0;i<strlen(str);i++)
     {
-        add(at,str,i);
+        add(at,str,i,0);
     }
 
-    int t = size;
+    int t = at->size;
     at->ptr = NULL_NODE_INDEX;
     char str2[2000];
-    strcpy(str2, "tkt");
+    strcpy(str2, "aba");
     for(int i=0;i<strlen(str2);i++)
     {
-        add(at,str2,i);
+        add(at,str2,i,1);
     }
 
-    for(int i=2;i<=size;i++)
+    for(int i=2;i<=at->size;i++)
     {
-        int start,end;
-        start = at->nodeArray[i].start;
-        end = at->nodeArray[i].end;
+        int start;
         
-        for(int j=start;j<=end;j++)
+        if(i<t)
         {
-            if(i<=t)
-                printf("%c",str[j]);
+            start=at->nodeArray[i].start[0];
+        }
+        else
+        {
+            start=at->nodeArray[i].start[1];
+        }
+        for(int k=start;k<start+at->nodeArray[i].length;k++)
+        {
+            if(i<t)
+            {
+
+                printf("%c",str[k]);
+            }
             else 
-                printf("%c",str2[j]);
+                printf("%c",str2[k]);
         }
         puts("");
     }
