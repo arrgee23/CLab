@@ -5,7 +5,7 @@
 #include <ctype.h>
 
 #define ALPHABET_SIZE 26 // a-z
-#define MAX_NODES 100000
+#define MAX_NODES 1000000
 #define NULL_NODE_INDEX 1
 #define IMAGINARY_NODE_INDEX 0
 #define MAX_NO_OF_STRINGS 100

@@ -105,6 +105,10 @@ char** readAndParse(int argc, char **argv,char** stringArray)
     return stringArray;
 }
 
+void findCommonSubplalindromes()
+{
+    // traverse through the built tree and increase count for all the nodes where every start bit != -1
+}
 int main(int argc, char **argv)
 {
     int noOfStrings = argc-1;
