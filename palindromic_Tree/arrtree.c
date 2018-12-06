@@ -4,35 +4,8 @@
 * Planidromic Tree Implementation
 * 29-Nov-2018
 */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-#define ALPHABET_SIZE 26 // a-z
-#define MAX_NODES 100000
-#define NULL_NODE_INDEX 1
-#define IMAGINARY_NODE_INDEX 0
-#define MAX_NO_OF_STRINGS 100
-
-#define DEBUG
-typedef struct Node
-{
-    int start[MAX_NO_OF_STRINGS]; // start index of all strings start[i] is -1 if no such string 
-    int length;
-    int sEdge;                // index of suffix edge node
-    int iEdge[ALPHABET_SIZE]; // insertion edge node
-
-    // boolean array of k elements for k strings should be here for joint arrtree
-
-} node;
-
-typedef struct PalindromicTree
-{
-    //char* string; // string for which the tree is built
-    node nodeArray[MAX_NODES];
-    int ptr; // points to the last created node. longest palindrome
-    int size; // total no of nodes
-} arrTree;
+#include "eerTree.h"
 
 void initNode(node *n, int len)
 {
@@ -59,6 +32,7 @@ void initTree(arrTree *t)
     t->ptr = NULL_NODE_INDEX; // points to null node initialy
     t->size = 2;
 }
+
 // add I th char of the j th string to the eertrree
 void add(arrTree *t, char *string, int i,int j)
 {
@@ -86,7 +60,7 @@ void add(arrTree *t, char *string, int i,int j)
     // now we have found X
     // add the character as an insertion edge if its not already there
     // setup its suffix link
-    if (parent->iEdge[string[i] - 'a'] == -1)
+    if (parent->iEdge[string[i] - 'A'] == -1)
     {
         // make a new node
         t->ptr=t->size;
@@ -94,7 +68,7 @@ void add(arrTree *t, char *string, int i,int j)
         node *newNode = &(t->nodeArray[t->size++]);
 
         initNode(newNode, parent->length + 2);   // the length would be parent node +2
-        parent->iEdge[string[i] - 'a'] = t->ptr; // add insertion edge
+        parent->iEdge[string[i] - 'A'] = t->ptr; // add insertion edge
 
         // adjust start and end
         newNode->start[j] = i - newNode->length + 1;
@@ -127,59 +101,12 @@ void add(arrTree *t, char *string, int i,int j)
             }
 
             // set the suffix edge
-            newNode->sEdge = t->nodeArray[cursor].iEdge[string[i]-'a'];
+            newNode->sEdge = t->nodeArray[cursor].iEdge[string[i]-'A'];
         }
     }
     else
     {
         // just make the tree pointer point to the current node
-        t->ptr = parent->iEdge[string[i] - 'a'];
+        t->ptr = parent->iEdge[string[i] - 'A'];
     }
-}
-
-int main()
-{
-    char str[2000];
-    strcpy(str, "abba");
-    arrTree* at = malloc(sizeof(arrTree));
-    initTree(at);
-    for(int i=0;i<strlen(str);i++)
-    {
-        add(at,str,i,0);
-    }
-
-    int t = at->size;
-    at->ptr = NULL_NODE_INDEX;
-    char str2[2000];
-    strcpy(str2, "aba");
-    for(int i=0;i<strlen(str2);i++)
-    {
-        add(at,str2,i,1);
-    }
-
-    for(int i=2;i<=at->size;i++)
-    {
-        int start;
-        
-        if(i<t)
-        {
-            start=at->nodeArray[i].start[0];
-        }
-        else
-        {
-            start=at->nodeArray[i].start[1];
-        }
-        for(int k=start;k<start+at->nodeArray[i].length;k++)
-        {
-            if(i<t)
-            {
-
-                printf("%c",str[k]);
-            }
-            else 
-                printf("%c",str2[k]);
-        }
-        puts("");
-    }
-    return 0;
 }
