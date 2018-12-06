@@ -1,5 +1,12 @@
 #include "eerTree.h"
-
+/*
+(a) Finding the number of subpalindromes, common to all k given strings.
+(b) Finding the longest subpalindrome contained in all k given strings.
+(c) For the strings S and T, finding the number of palindromes P having more occurrences
+in S than in T.
+(d) For the strings S and T, finding the number of equal palindromes, i.e., of triples (i, j, k)
+such that S[i..i + k] = T[j..j + k] is a palindrome.
+*/
 char** readAndParse(int argc, char **argv,char** stringArray)
 {
     int filecount = argc - 1;
