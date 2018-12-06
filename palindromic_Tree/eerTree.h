@@ -10,10 +10,10 @@
 #define IMAGINARY_NODE_INDEX 0
 #define MAX_NO_OF_STRINGS 100
 
-#define DEBUG
+#undef DEBUG
 typedef struct Node
 {
-    int start[MAX_NO_OF_STRINGS]; // start index of all strings start[i] is -1 if no such string 
+    int* start; // start index of all strings start[i] is -1 if no such string 
     int length;
     int sEdge;                // index of suffix edge node
     int iEdge[ALPHABET_SIZE]; // insertion edge node
@@ -28,12 +28,16 @@ typedef struct PalindromicTree
     node nodeArray[MAX_NODES];
     int ptr; // points to the last created node. longest palindrome
     int size; // total no of nodes
-    int capacity;
-} arrTree;
+    int noOfStrings;
+} eerTree;
 
-void initNode(node *n, int len);
+void initNode(node *n, int len,int nos);
 
-void initTree(arrTree *t);
+void initTree(eerTree *t, int nos);
 
+void addString(eerTree* at, char* str,int index);
 // add I th char of the j th string to the eertrree
-void add(arrTree *t, char *string, int i,int j);
+void add(eerTree *t, char *string, int i,int j);
+
+
+void printStrings(eerTree *t,char** stringArray);

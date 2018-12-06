@@ -7,34 +7,48 @@
 
 #include "eerTree.h"
 
-void initNode(node *n, int len)
+void initNode(node *n, int len,int nos)
 {
     n->length = len;
     n->sEdge = -1;
     int i = 0;
     for (i = 0; i < ALPHABET_SIZE; i++)
         n->iEdge[i] = -1;
-    for (i = 0; i < MAX_NO_OF_STRINGS; i++)
+    n->start = (int*)malloc(nos*sizeof(int));
+    for (i = 0; i < nos; i++)
         n->start[i] = -1;
 }
-void initTree(arrTree *t)
-{
-    // nodearry 0 is the imaginary node  and 1st node is null string node
 
+void initTree(eerTree *t, int nos)
+{
+    t->noOfStrings = nos;
+    // nodearry 0 is the imaginary node  and 1st node is null string node
+    
     // 0 th node is imaginary node
-    initNode(&(t->nodeArray[IMAGINARY_NODE_INDEX]), -1);
+    initNode(&(t->nodeArray[IMAGINARY_NODE_INDEX]), -1,t->noOfStrings);
     t->nodeArray[IMAGINARY_NODE_INDEX].sEdge = IMAGINARY_NODE_INDEX;
 
     // 1st node is null  string
-    initNode(&(t->nodeArray[NULL_NODE_INDEX]), 0);
+    initNode(&(t->nodeArray[NULL_NODE_INDEX]), 0,t->noOfStrings);
     t->nodeArray[NULL_NODE_INDEX].sEdge = IMAGINARY_NODE_INDEX;
 
     t->ptr = NULL_NODE_INDEX; // points to null node initialy
     t->size = 2;
+    
+}
+
+
+void addString(eerTree* at, char* str,int index)
+{
+    for(int i=0;i<strlen(str);i++)
+    {
+        add(at,str,i,index);
+    }
+    at->ptr = NULL_NODE_INDEX;
 }
 
 // add I th char of the j th string to the eertrree
-void add(arrTree *t, char *string, int i,int j)
+void add(eerTree *t, char *string, int i,int j)
 {
     int cursor = t->ptr;
 
@@ -67,7 +81,7 @@ void add(arrTree *t, char *string, int i,int j)
         //node *newNode = &(t->nodeArray[t->ptr]);
         node *newNode = &(t->nodeArray[t->size++]);
 
-        initNode(newNode, parent->length + 2);   // the length would be parent node +2
+        initNode(newNode, parent->length + 2,t->noOfStrings);   // the length would be parent node +2
         parent->iEdge[string[i] - 'A'] = t->ptr; // add insertion edge
 
         // adjust start and end
@@ -108,5 +122,35 @@ void add(arrTree *t, char *string, int i,int j)
     {
         // just make the tree pointer point to the current node
         t->ptr = parent->iEdge[string[i] - 'A'];
+    }
+}
+
+void printStrings(eerTree *t,char** stringArray)
+{
+    int i=0;
+    for(i=2;i<t->size;i++)
+    {
+        node n = t->nodeArray[i];
+        int stringIndex = -1;
+        int j=0;
+        for(j=0;j<t->noOfStrings;j++)
+        {
+            if(n.start[j]!=-1)
+            {
+                stringIndex = j;
+                break;
+            }
+        }
+
+        int start = n.start[stringIndex];
+        int len = n.length;
+        #ifdef DEBUG
+        printf("string: %d, start: %d len: %d\n",stringIndex,start,len);
+        #endif
+        for(j=0;j<len;j++)
+        {
+            printf("%c",stringArray[stringIndex][start+j]);
+        }
+        printf("\n");
     }
 }

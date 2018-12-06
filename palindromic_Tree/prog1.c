@@ -104,9 +104,11 @@ int main(int argc, char **argv)
     char** stringArray = NULL;
     stringArray = readAndParse(argc,argv,stringArray);
     
+    /*
     for(int i=0;i<noOfStrings;i++)
     {
         printf("%s\n",stringArray[i]);
-    }
+    }*/
+    
     return 0;
 }
