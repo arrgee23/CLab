@@ -1,3 +1,12 @@
+/*
+* Rahul Gautam
+* CS1835
+* Indian Statistical Institute
+* Planidromic Tree Implementation
+* 7-Dec-2018
+* Description:
+*  Finding the number of subpalindromes, common to all k given strings.
+*/
 #include "eerTree.h"
 
 char** readAndParse(int argc, char **argv,char** stringArray)
@@ -41,7 +50,7 @@ char** readAndParse(int argc, char **argv,char** stringArray)
             int sp=0;
             int i=0;
             int firstLineRead = 0;
-            char sub = 'X';
+            char sub = 'N';
             int subFound = 0;
             
             for(i=0;i<length;i++)
@@ -64,9 +73,9 @@ char** readAndParse(int argc, char **argv,char** stringArray)
                              // covert lowercase in uppercase and reject others
                             c = toupper(c);
                             // in case of DNA
-                            if(subFound==0 && (c=='A' || c=='G' || c=='C' || c=='T'))
+                            if(subFound==0 && (c!='A' && c!='G' && c!='C' && c!='T'))
                             {
-                                sub = 'N';
+                                sub = 'X';
                                 subFound = 1;
                             }
                         }
@@ -98,15 +107,65 @@ char** readAndParse(int argc, char **argv,char** stringArray)
     return stringArray;
 }
 
+int isCommonInAll(node* n,int size)
+{
+    int i=0;
+    //printf("size = %d length=%d\n",size,n->length);
+    for(i=0;i<size;i++)
+    {
+        //printf("starti =%d",n->start[i]);
+        if(n->start[i]== -1)
+            return 0;
+    }
+    //printf("\n\n");
+    return 1;
+}
+void printSubStr(char* str,int i,int j)
+{
+    int k;
+    for(k=i;k<j;k++)
+        printf("%c",str[k]);
+    printf("\n");
+}
+void findCommonSubplalindromes(char** stringArray,int size)
+{
+    // traverse through the built tree and increase count for all the nodes where every start bit != -1
+    eerTree *at = malloc(sizeof(eerTree));
+    initTree(at, size);
+    int i=0;
+    for(i=0;i<size;i++)
+        addString(at, stringArray[i], i);
+
+    //printStrings(at, stringArray);
+    int count=0;
+    for(i=2;i<at->size;i++)
+    {
+        if(isCommonInAll(&(at->nodeArray[i]),at->noOfStrings))
+        {
+            #ifdef DEBUG
+            //printf("common\n");
+            char* str = stringArray[0];
+            int start = at->nodeArray[i].start[0];
+            int len = at->nodeArray[i].length;
+
+            printSubStr(str,start,start+len);
+            #endif
+            count++;
+        }
+    }
+    printf("\nNumber of common palindromes: %d\n",count);
+}
 int main(int argc, char **argv)
 {
-    int noOfStrings = argc-1;
     char** stringArray = NULL;
     stringArray = readAndParse(argc,argv,stringArray);
     
+    findCommonSubplalindromes(stringArray,argc-1);
+       /*
     for(int i=0;i<noOfStrings;i++)
     {
         printf("%s\n",stringArray[i]);
-    }
+    }*/
+    
     return 0;
 }

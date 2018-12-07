@@ -1,5 +1,13 @@
+/*
+* Rahul Gautam
+* CS1835
+* Indian Statistical Institute
+* Planidromic Tree Implementation
+* 7-Dec-2018
+* Description:
+*  For the strings S and T, finding the number of palindromes P having more occurrences in S than in T.
+*/
 #include "eerTree.h"
-
 char** readAndParse(int argc, char **argv,char** stringArray)
 {
     int filecount = argc - 1;
@@ -98,15 +106,41 @@ char** readAndParse(int argc, char **argv,char** stringArray)
     return stringArray;
 }
 
+void countPalinOcc(char** stringArray,int size)
+{
+    eerTree *at = malloc(sizeof(eerTree));
+    initTree(at, size);
+    int i=0;
+    for(i=0;i<size;i++)
+    {
+        addString(at, stringArray[i], i);
+        calculateOCC(at,i); // calculate occurance of each palindromic substring for each string
+    }
+    //printStrings(at, stringArray);
+
+    /*
+        * 
+        */
+    int count = 0;
+    for (i = 2; i < at->size; i++)
+    {
+        if (at->nodeArray[i].occ[0] > at->nodeArray[i].occ[1])
+            count++;
+    }
+    printf("%d\n", count);
+}
+
 int main(int argc, char **argv)
 {
-    int noOfStrings = argc-1;
     char** stringArray = NULL;
     stringArray = readAndParse(argc,argv,stringArray);
     
+    countPalinOcc(stringArray,argc-1);
+       /*
     for(int i=0;i<noOfStrings;i++)
     {
         printf("%s\n",stringArray[i]);
-    }
+    }*/
+    
     return 0;
 }
