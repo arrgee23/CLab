@@ -59,6 +59,7 @@ void countWord(TrieNode *root, char *inputFile)
     int index = -1;
 
     int invalid = 0;
+    char lastChar = 0;
     while ((c = fgetc(fp)) != EOF)
     {
 
@@ -99,6 +100,19 @@ void countWord(TrieNode *root, char *inputFile)
                 cursor = root;
             }
             invalid = 0;
+        }
+        lastChar = c;
+    }
+    // we have encountered EOF
+    if (isalnum(lastChar)) // we didnot print output for the last line
+    {
+        if (!invalid) // valid
+        {
+            printf(" %lld\n", cursor->wordsStartingWith);
+        }
+        else
+        {
+            printf(" 0\n");
         }
     }
 }
