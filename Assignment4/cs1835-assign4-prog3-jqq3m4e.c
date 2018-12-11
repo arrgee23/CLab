@@ -8,6 +8,9 @@
 * Build Instruction: 
 gcc cs1835-assign4-prog3-jqq3m4e.c -o prog3
 
+* Acknowledgements: I have taken geeksforgeeks AVL tree code and used it with few modification 
+for AVL tree
+
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,6 +19,16 @@ gcc cs1835-assign4-prog3-jqq3m4e.c -o prog3
 #include <time.h>
 
 #define CHAR_SIZE 8
+
+// An AVL tree node 
+struct Node 
+{ 
+	int key; 
+	struct Node *left; 
+	struct Node *right; 
+	int height; 
+}; 
+
 
 // allocates minimum size character array capable  to store m bits
 // sets the value pointed by len as number of characters allocated
@@ -132,14 +145,6 @@ double doBloomFilterCalculation(int argc, char **argv)
     return cpu_time_used;
 }
 
-// An AVL tree node 
-struct Node 
-{ 
-	int key; 
-	struct Node *left; 
-	struct Node *right; 
-	int height; 
-}; 
 
 // A utility function to get maximum of two integers 
 int max(int a, int b); 
@@ -312,7 +317,7 @@ double doAVLCalculation(int argc, char** argv,int* nodesUsed)
 
     cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
     *nodesUsed = insertCount;
-    preOrder(root);
+    //preOrder(root);
     return cpu_time_used;
 }
 
@@ -328,10 +333,8 @@ int main(int argc, char **argv)
     double bloomTime = doBloomFilterCalculation(argc, argv);
     int nodeCount;
     double avlTime = doAVLCalculation(argc, argv,&nodeCount);
-    
-    printf("\n%lf\n",bloomTime);
-    printf("\n%lf\n",avlTime);
-    printf("%d\n",nodeCount);
+    fprintf(stderr, "Using AVL tree:\n\tNumber of bytes: %ld, Time taken: %lf sec\n",nodeCount*sizeof(struct Node),avlTime);
+    fprintf(stderr, "Using Bloom Filter:\n\tTime taken: %lf sec\n",bloomTime);
 
     return 0;
 }
