@@ -1,10 +1,12 @@
 /*
-Rahul Gautam
-Indian Statistical Institute
-CS1835
-09-Dec-2018
-Given a text file and a file with strings, return the number of occurances of each string 
+* Rahul Gautam
+* Indian Statistical Institute
+* CS1835
+* 09-Dec-2018
+* Given a text file and a file with strings, return the number of occurances of each string 
 as prefix in the text file 
+
+* Build Instruction: gcc cs1835-assign4-prog2-jqq3m4e.c trie.c -o prog2
 
 */
 #include "trie.h"
